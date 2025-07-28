@@ -20,27 +20,30 @@ function Welcome() {
 
     if (tokenFromURL) {
       localStorage.setItem("token", tokenFromURL);
+      console.log("📥 Token saved from URL");
     }
 
     const token = tokenFromURL || localToken;
 
     if (!token) {
+      console.warn("🚫 No token found, redirecting...");
       navigate("/login");
       return;
     }
 
     try {
       const decoded: DecodedToken = jwtDecode(token);
-
       const currentTime = Math.floor(Date.now() / 1000);
+
       if (decoded.exp < currentTime) {
+        console.warn("⏰ Token expired");
         localStorage.removeItem("token");
         navigate("/login");
       } else {
         setEmail(decoded.email);
       }
     } catch (err) {
-      console.error("Invalid token", err);
+      console.error("❌ Invalid token", err);
       localStorage.removeItem("token");
       navigate("/login");
     }
@@ -56,11 +59,13 @@ function Welcome() {
   };
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-100 to-indigo-100">
-      <h1 className="text-3xl font-bold text-indigo-700 mb-2">
+    <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-gray-900 dark:to-gray-800 transition duration-300">
+      <h1 className="text-3xl font-bold text-indigo-700 dark:text-indigo-300 mb-2">
         Welcome, {email} 🎉
       </h1>
-      <p className="text-gray-700 mb-6">You're successfully logged in.</p>
+      <p className="text-gray-700 dark:text-gray-300 mb-6">
+        You're successfully logged in.
+      </p>
 
       <div className="space-x-4">
         <button
@@ -69,7 +74,6 @@ function Welcome() {
         >
           Go to Notes
         </button>
-
         <button
           onClick={handleLogout}
           className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition"
